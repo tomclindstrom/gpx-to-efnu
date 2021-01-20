@@ -1,31 +1,67 @@
-import gpxpy
 import os
+from dateutil import tz
+from datetime import timedelta
+
+import gpxpy
+import geopy.distance
+
+
+class Track:
+    def __init__(self, track, distance, startTime, endTime):
+        self.track = track
+        self.distance = distance
+        self.startTime = startTime
+        self.endTime = endTime
+
+    def duration(self):
+            if self.startTime != "" and self.endTime != "":
+                return self.endTime - self.startTime
+            else:
+                return timedelta(0)
+
+    def durationToStr(self):
+        duration = self.duration()
+        hours, remainder = divmod(duration.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
+
 
 def main(gpxFilename, htmlFilename) -> None:
-    track: list = load_track(gpxFilename)
-    if(track != None and len(track) > 0):
+    track: Track = load_track(gpxFilename)
+    if(track != None and len(track.track) > 0):
         generate_html(track, htmlFilename)
         print("Done generating html page: ", htmlFilename)
 
-def load_track(filename: str) -> list:
-    trackPoints: list = []
+
+def load_track(filename: str) -> Track:
     if(os.path.exists(filename) == False):
         print(f"File not found: {filename}")
-        return
+        return None
+    localtime = tz.tzlocal()
     gpx_file = open(filename)
+    current_track = Track([], 0, "", "")
     try:
         gpx = gpxpy.parse(gpx_file)
+        prevPoint = (0, 0)
         for track in gpx.tracks:
             for segment in track.segments:
                 for point in segment.points:
-                    trackPoints.append(
-                        [float(point.latitude), float(point.longitude)])
+                    current_track.track.append([float(point.latitude), float(point.longitude)])
+                    if current_track.startTime == "":
+                        current_track.startTime = point.time.astimezone(localtime)
+                    current_track.endTime = point.time.astimezone(localtime)
+                    if prevPoint != (0, 0):
+                        pointDistance = geopy.distance.distance(prevPoint, (float(point.latitude), float(point.longitude))).km
+                        current_track.distance = current_track.distance + pointDistance
+                    prevPoint = (float(point.latitude),float(point.longitude))
     except Exception as error:
         print(f"\nParsing file '{filename}' failed. Error: {error}")
+        current_track = None
     gpx_file.close()
-    return(trackPoints)
+    return(current_track)
 
-def generate_html(track: list, file_out: str) -> None:
+
+def generate_html(track: Track, file_out: str) -> None:
     """Generates a new html file with points"""
     template = """
     <html><head>
@@ -35,15 +71,29 @@ def generate_html(track: list, file_out: str) -> None:
   #mapId {
     position: absolute;
     top: 0px;
-    width: 1000px;
+    width: 800px;
     left: 0px; 
-    height: 1000px;
+    height: 800px;
     border: 1px solid #000;
   }  
+  #info {
+    position: absolute;
+    top: 0px;
+    left: 805px;
+    border: 1px solid #000;
+    background-color: #ddd;
+    font-size: larger;
+    padding: 5px;
+  }
 </style>
 </head>
 <body>
   <div id="mapId"></div>
+  <div id="info">
+    <h1>Track info</h1>
+    <div id="duration"></div>
+    <div id="distance"></div>
+  </div>
   <script>
     var myMap = L.map('mapId').setView([55.641, 12.47], 13);
     L.tileLayer(
@@ -56,17 +106,22 @@ def generate_html(track: list, file_out: str) -> None:
         zoomOffset: -1
       }).addTo(myMap);
     var track = [];
+    var duration = '';
+    var distance = '';
     L.polyline(track, {color: 'blue'}).addTo(myMap);;
   </script>
 </body></html>    
     """
 
-    track_points = ",".join([f"[{g_track_point[0]}, {g_track_point[1]}, 0.1]" for g_track_point in track])
+    track_points = ",".join([f"[{g_track_point[0]}, {g_track_point[1]}, 0.1]" for g_track_point in track.track])
     track_points = f"var track=[{track_points}];"
     template = template.replace("var track = [];", track_points)
+    template = template.replace('<div id="duration"></div>', '<div id="duration">Duration: ' + track.durationToStr() + '</div>')
+    template = template.replace('<div id="distance"></div>', '<div id="distance">Distance: ' + str(round(track.distance, 2)) + ' km</div>')
     f = open(file_out, "w")
     f.write(template)
     f.close()
+
 
 if __name__ == '__main__':
     main("myTrack.gpx", "myTrack.html")
