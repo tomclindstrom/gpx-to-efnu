@@ -8,7 +8,7 @@
       "type": "pwa-chrome",
       "request": "launch",
       "name": "Launch Chrome against localhost",
-      "url": "file:///D:/Src/gpx-to-leaflet/myTrack.html",
+      "url": "file:///D:/Src/Github/gpx-to-leaflet/myTrack.html",
       "webRoot": "${workspaceFolder}"
     }
   ]
