@@ -6,24 +6,41 @@ import gpxpy
 import geopy.distance
 
 
+class DistanceMarker:
+    def __init__(self, latitude, longitude, label):
+        self.latitude = latitude
+        self.longitude = longitude
+        self.label = label
+
+    def toJsString(self):
+        return f"""
+            L.marker([{self.latitude},{self.longitude}], {{
+              icon: L.divIcon({{ html: '<span style="font-size: 20px; font-weight: bold">{self.label}</span>' }})
+            }}).addTo(myMap);"""
+
+
 class Track:
-    def __init__(self, track, distance, startTime, endTime):
+    def __init__(self, track, distance, startTime, endTime, distanceMarkers=[]):
         self.track = track
         self.distance = distance
         self.startTime = startTime
         self.endTime = endTime
+        self.distanceMarkers = distanceMarkers
 
     def duration(self):
-            if self.startTime != "" and self.endTime != "":
-                return self.endTime - self.startTime
-            else:
-                return timedelta(0)
+        if self.startTime != "" and self.endTime != "":
+            return self.endTime - self.startTime
+        else:
+            return timedelta(0)
 
     def durationToStr(self):
         duration = self.duration()
         hours, remainder = divmod(duration.seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         return '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
+
+    def distanceMarkersToJsStr(self):
+        return "\n".join(map(lambda marker: marker.toJsString(), self.distanceMarkers))
 
 
 def main(gpxFilename, htmlFilename) -> None:
@@ -43,6 +60,7 @@ def load_track(filename: str) -> Track:
     try:
         gpx = gpxpy.parse(gpx_file)
         prevPoint = (0, 0)
+        prevDistance = 0
         for track in gpx.tracks:
             for segment in track.segments:
                 for point in segment.points:
@@ -53,7 +71,11 @@ def load_track(filename: str) -> Track:
                     if prevPoint != (0, 0):
                         pointDistance = geopy.distance.distance(prevPoint, (float(point.latitude), float(point.longitude))).km
                         current_track.distance = current_track.distance + pointDistance
-                    prevPoint = (float(point.latitude),float(point.longitude))
+                    if(int(current_track.distance) > prevDistance):
+                        prevDistance = int(current_track.distance)
+                        newDistanceMarker = DistanceMarker(point.latitude, point.longitude, f"{int(prevDistance)}km")
+                        current_track.distanceMarkers.append(newDistanceMarker)
+                    prevPoint = (float(point.latitude), float(point.longitude))
     except Exception as error:
         print(f"\nParsing file '{filename}' failed. Error: {error}")
         current_track = None
@@ -108,7 +130,8 @@ def generate_html(track: Track, file_out: str) -> None:
     var track = [];
     var duration = '';
     var distance = '';
-    L.polyline(track, {color: 'blue'}).addTo(myMap);;
+    L.polyline(track, {color: 'blue'}).addTo(myMap);
+    <!--DISTANCEMARKERS-->
   </script>
 </body></html>    
     """
@@ -118,6 +141,7 @@ def generate_html(track: Track, file_out: str) -> None:
     template = template.replace("var track = [];", track_points)
     template = template.replace('<div id="duration"></div>', '<div id="duration">Duration: ' + track.durationToStr() + '</div>')
     template = template.replace('<div id="distance"></div>', '<div id="distance">Distance: ' + str(round(track.distance, 2)) + ' km</div>')
+    template = template.replace('<!--DISTANCEMARKERS-->', track.distanceMarkersToJsStr())
     f = open(file_out, "w")
     f.write(template)
     f.close()
