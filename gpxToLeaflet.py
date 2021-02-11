@@ -130,7 +130,40 @@ def generate_html(track: Track, file_out: str) -> None:
     var track = [];
     var duration = '';
     var distance = '';
-    L.polyline(track, {color: 'blue'}).addTo(myMap);
+        const polyline = L.polyline(track, {color: 'blue'}).addTo(myMap);
+    var highlightMarker = undefined;
+    polyline.on('click', function(e) {
+      const closestIdx = findPointIdxOnPolyline(track, e.latlng);
+      const trackLength = lengthOfTrack(track, closestIdx);
+      if(highlightMarker != undefined) {
+        myMap.removeLayer(highlightMarker);
+      }
+      highlightMarker = L.marker(track[closestIdx], {icon: L.divIcon({ html: '<span style="font-size: 20px; font-weight: bold">' + Math.round(trackLength) + 'm</span>' })}).addTo(myMap);
+    });
+
+    function findPointIdxOnPolyline(track, latlng) {
+      let prevDiffLat = prevDiffLng = 99999;
+      let closestIdx = 0;
+      for(var i = 0; i < track.length; i++) {
+        var diffLat =  Math.abs(track[i][0] - latlng.lat);
+        var diffLng = Math.abs(track[i][1] - latlng.lng);
+        if(diffLat + diffLng < prevDiffLat + prevDiffLng) {
+          prevDiffLat = diffLat;
+          prevDiffLng = diffLng;
+          closestIdx = i;
+        }
+      }
+      return closestIdx;
+    }
+    function lengthOfTrack(track, idx) {
+      var length = 0;
+      for(var i = 1; i < track.length && i < idx; i++) {
+        let from = L.latLng(track[i-1]);
+        let to = L.latLng(track[i]);
+        length += from.distanceTo(to);
+      }
+      return length;
+    }
     <!--DISTANCEMARKERS-->
   </script>
 </body></html>    
