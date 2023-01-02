@@ -109,7 +109,7 @@ def generate_html(track: Track, file_out: str) -> None:
   }
 
   .efnu {
-  background-color #0088FF;
+  background-color: #0088FF;
   border: 1px solid red;
   padding: 5px;
 
