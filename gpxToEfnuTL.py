@@ -123,8 +123,15 @@ def generate_html(track: Track, file_out: str) -> None:
     
     color: #ffffff;
     font-size: larger;
-    
+  }
+  #duration {
 
+    color: #00FF01;
+  }
+
+  #distance {
+
+    color: #00FF01; 
   }
 </style>
 </head>
