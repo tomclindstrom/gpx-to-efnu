@@ -102,9 +102,10 @@ def generate_html(track: Track, file_out: str) -> None:
     position: absolute;
     top: 0px;
     left: 805px;
-    border: 1px solid #000;
-    background-color: #ddd;
+    border: 1px solid red;
+    background-color: #0088FF;
     font-size: larger;
+    
     padding: 5px;
   }
 
@@ -119,7 +120,8 @@ def generate_html(track: Track, file_out: str) -> None:
   }
 
   .info_efnu {
-    color: red;
+    
+    color: #ffffff;
     font-size: larger;
     
 
