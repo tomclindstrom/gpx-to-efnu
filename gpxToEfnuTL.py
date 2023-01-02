@@ -107,17 +107,24 @@ def generate_html(track: Track, file_out: str) -> None:
     font-size: larger;
     padding: 5px;
   }
+
+  .efnu {
+  background-color #0088FF;
+
+  }
 </style>
 </head>
 <body>
   <div id="mapId"></div>
   <div id="info">
+  <div class=".efnu">
     <h1>Track info</h1>
     <div id="duration"></div>
     <div id="distance"></div>
   </div>
+  </div>
   <script>
-    var myMap = L.map('mapId').setView([55.641, 12.47], 13);
+    var myMap = L.map('mapId').setView([60.333889, 24.296389], 13);
     L.tileLayer(
       'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
@@ -130,7 +137,7 @@ def generate_html(track: Track, file_out: str) -> None:
     var track = [];
     var duration = '';
     var distance = '';
-        const polyline = L.polyline(track, {color: 'blue'}).addTo(myMap);
+        const polyline = L.polyline(track, {color: 'red'}).addTo(myMap);
     var highlightMarker = undefined;
     polyline.on('click', function(e) {
       const closestIdx = findPointIdxOnPolyline(track, e.latlng);
