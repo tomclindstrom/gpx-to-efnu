@@ -136,7 +136,7 @@ def generate_html(track: Track, file_out: str) -> None:
   </div>
   </div>
   <script>
-    var myMap = L.map('mapId').setView([60.333889, 24.296389], 16);
+    var myMap = L.map('mapId').setView([60.333889, 24.296389], 14);
     L.tileLayer(
       'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
