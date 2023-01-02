@@ -133,6 +133,12 @@ def generate_html(track: Track, file_out: str) -> None:
 
     color: #00FF01; 
   }
+  .yrno{
+
+    position: absolute;
+    
+    left: 805px;
+  }
 </style>
 </head>
 <body>
@@ -142,8 +148,49 @@ def generate_html(track: Track, file_out: str) -> None:
     <h1 class="info_efnu">Efnu Track info by Tomosart</h1>
     <div id="duration"></div>
     <div id="distance"></div>
+    <br>
+    <div class="weatherWidget" ></div>
+    <br>
+    <div>
+    <iframe src="https://www.meteoblue.com/en/weather/widget/daily/nummela_finland_11711396?geoloc=fixed&days=7&tempunit=CELSIUS&windunit=KILOMETER_PER_HOUR&precipunit=MILLIMETER&coloured=coloured&pictoicon=0&pictoicon=1&maxtemperature=0&maxtemperature=1&mintemperature=0&mintemperature=1&windspeed=0&windspeed=1&windgust=0&winddirection=0&winddirection=1&uv=0&humidity=0&humidity=1&precipitation=0&precipitation=1&precipitationprobability=0&precipitationprobability=1&spot=0&spot=1&pressure=0&pressure=1&layout=dark"  frameborder="0" scrolling="NO" allowtransparency="true" sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox" style="width: 378px; height: 420px"></iframe><div><!-- DO NOT REMOVE THIS LINK --><a href="https://www.meteoblue.com/en/weather/week/nummela_finland_11711396?utm_source=weather_widget&utm_medium=linkus&utm_content=daily&utm_campaign=Weather%2BWidget" target="_blank" rel="noopener">meteoblue</a></div>
+    </div>
+  <!-- Uusi weather div -->
+  <div class="yrno">
+    <!-- the DIV that will contain the widget -->
+
+
+  
   </div>
+  <!-- Uusi weather div ends here-->
+
   </div>
+
+
+  </div>
+  
+  
+
+  <script>
+   window.weatherWidgetConfig =  window.weatherWidgetConfig || [];
+   window.weatherWidgetConfig.push({
+       selector:".weatherWidget",
+       apiKey:"6RXW7H4AXXLV8899EVUZSKSVV", //Sign up for your personal key
+       location:"Finland, Nummela", //Enter an address
+       unitGroup:"metric", //"fi" or "metric"
+       forecastDays:15, //how many days forecast to show
+       title:"Finland,Nummela/Efnu", //optional title to show in the 
+       showTitle:true, 
+       showConditions:true
+   });
+  
+   (function() {
+   var d = document, s = d.createElement('script');
+   s.src = 'https://www.visualcrossing.com/widgets/forecast-simple/weather-forecast-widget-simple.js';
+   s.setAttribute('data-timestamp', +new Date());
+   (d.head || d.body).appendChild(s);
+   })();
+</script>
+
   <script>
     var myMap = L.map('mapId').setView([60.333889, 24.296389], 14);
     L.tileLayer(
