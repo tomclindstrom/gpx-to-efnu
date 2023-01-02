@@ -109,13 +109,16 @@ def generate_html(track: Track, file_out: str) -> None:
   }
 
   .efnu {
+    position: absolute;
+    top: 0px;
+    left: 805px;
   background-color: #0088FF;
-  border: 1px solid red;
+  border: 5px solid red;
   padding: 5px;
 
   }
 
-  .info {
+  .info_efnu {
     color: red;
     font-size: larger;
     
@@ -127,7 +130,7 @@ def generate_html(track: Track, file_out: str) -> None:
   <div id="mapId"></div>
   <div id="info">
   <div class=".efnu">
-    <h1 class="info">Efnu Track info by Tomosart</h1>
+    <h1 class="info_efnu">Efnu Track info by Tomosart</h1>
     <div id="duration"></div>
     <div id="distance"></div>
   </div>
