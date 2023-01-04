@@ -90,6 +90,7 @@ def generate_html(track: Track, file_out: str) -> None:
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
   <style type="text/css">
+   
   #mapId {
     position: absolute;
     top: 0px;
@@ -134,11 +135,47 @@ def generate_html(track: Track, file_out: str) -> None:
     color: #00FF01; 
   }
   .yrno{
+    top: 0px;
+    display: flex;
 
-    position: absolute;
-    
-    left: 805px;
+    align-items: right;
+    position: absolute;    
   }
+  .latukunto{
+    font-size: larger;
+    color: white;
+
+  }
+
+  .inputR {
+  height: 30px;
+  width: 30px;
+  appearance: none;
+  background-color: red;
+  border-radius: 50%;
+  opacity: 1;
+  align-item: center;
+}
+input:hover {
+  cursor: pointer;
+}
+.tri-state-toggle {
+    
+  justify-content: center;
+  border: 3px solid black;
+  border-radius: 50px;
+  width: 150px;
+   font-family: system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1.1;
+  display: grid;
+  grid-template-columns: 1em auto;
+  gap: 0.5em;
+}
+#one {
+  opacity: 0;
+}
 </style>
 </head>
 <body>
@@ -149,26 +186,58 @@ def generate_html(track: Track, file_out: str) -> None:
     <div id="duration"></div>
     <div id="distance"></div>
     <br>
+    <div class="latukunto">
+      <input type="checkbox" id="1" class="box">Latukunto Pertsa </input><br>
+      <input type="checkbox" id="2" class="box">Latukunto Vapaa tyyli</input><br>
+      <input type="checkbox" id="3" class="box">Pururata OK</input><br>
+      <input type="checkbox" id="4" class="box">Lentokenttä OK</input><br>
+      <span>Latukunto valitse väri</span>
+      <br>
+      <input type="color" id="colorID" oninput="changeColor()">
+    </div>
+    <br>
+    <!-- later div class="tri-state-toggle">
+      <input class="button" type="radio" name="toggle" id="one" />
+      <input class="button" type="radio" name="toggle" id="two" />
+      <input class="button" type="radio" name="toggle" id="three" />
+    </div -->
+    <br>
+
     <div class="weatherWidget" ></div>
     <br>
     <div>
     <iframe src="https://www.meteoblue.com/en/weather/widget/daily/nummela_finland_11711396?geoloc=fixed&days=7&tempunit=CELSIUS&windunit=KILOMETER_PER_HOUR&precipunit=MILLIMETER&coloured=coloured&pictoicon=0&pictoicon=1&maxtemperature=0&maxtemperature=1&mintemperature=0&mintemperature=1&windspeed=0&windspeed=1&windgust=0&winddirection=0&winddirection=1&uv=0&humidity=0&humidity=1&precipitation=0&precipitation=1&precipitationprobability=0&precipitationprobability=1&spot=0&spot=1&pressure=0&pressure=1&layout=dark"  frameborder="0" scrolling="NO" allowtransparency="true" sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox" style="width: 378px; height: 420px"></iframe><div><!-- DO NOT REMOVE THIS LINK --><a href="https://www.meteoblue.com/en/weather/week/nummela_finland_11711396?utm_source=weather_widget&utm_medium=linkus&utm_content=daily&utm_campaign=Weather%2BWidget" target="_blank" rel="noopener">meteoblue</a></div>
+    
+    
     </div>
-  <!-- Uusi weather div -->
-  <div class="yrno">
-    <!-- the DIV that will contain the widget -->
-
-
   
-  </div>
-  <!-- Uusi weather div ends here-->
 
+    </div>
   </div>
 
+  
 
-  </div>
-  
-  
+  <!-- Todo radio color button -->
+  <script>
+  let boxes = document.getElementsByClassName('box').length;
+
+function save() {	
+  for(let i = 1; i <= boxes; i++){
+	  var checkbox = document.getElementById(String(i));
+    localStorage.setItem("checkbox" + String(i), checkbox.checked);	
+  }
+}
+
+//for loading
+for(let i = 1; i <= boxes; i++){
+  if(localStorage.length > 0){
+    var checked = JSON.parse(localStorage.getItem("checkbox" + String(i)));
+    document.getElementById(String(i)).checked = checked;
+  }
+}
+window.addEventListener('change', save);
+
+  </script>
 
   <script>
    window.weatherWidgetConfig =  window.weatherWidgetConfig || [];
@@ -240,6 +309,48 @@ def generate_html(track: Track, file_out: str) -> None:
       return length;
     }
     <!--DISTANCEMARKERS-->
+  </script>
+
+  <script>
+  var buttons = document.getElementsByClassName("button");
+var arr = [...buttons];
+
+arr.forEach((element, index) => {
+  element.addEventListener("click", () => {
+    element.style.opacity = "1";
+    if (index == 0) {
+      document.getElementsByTagName("body")[0].style.backgroundColor = "orange";
+    } else if (index == 1) {
+      document.getElementsByTagName("body")[0].style.backgroundColor = "#00FF01";
+    } else {
+      document.getElementsByTagName("body")[0].style.backgroundColor =  "#56B2E8";
+    }
+    arr
+      .filter(function (item) {
+        return item != element;
+      })
+      .forEach((item) => {
+        item.style.opacity = "0";
+      });
+  });
+});
+
+  </script>
+
+  <script>
+  // on input, get value and save it as 'storedValue'
+function changeColor() { 
+  var userColor = document.getElementById('colorID').value;
+  localStorage.setItem('storedValue', document.body.style.backgroundColor = userColor);
+}
+
+// if there is a value stored, update color picker and background color
+if(localStorage.storedValue) {
+  document.getElementById('colorID').value = localStorage.storedValue;
+  document.body.style.backgroundColor      = localStorage.storedValue;
+}
+
+
   </script>
 </body></html>    
     """
